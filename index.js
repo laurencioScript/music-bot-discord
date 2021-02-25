@@ -1,6 +1,13 @@
 const { Client, MessageAttachment, MessageEmbed  } = require('discord.js');
 const config = require("./config.json");
 const client = new Client();
+const { Player } = require("discord-player");
+// Create a new Player (you don't need any API Key)
+const player = new Player(client);
+// To easily access the player
+client.player = player;
+// add the trackStart event so when a song will be played this message will be sent
+client.player.on('trackStart', (message, track) => message.channel.send(`Now playing ${track.title}...`))
 
 // https://www.youtube.com/watch?v=VBj_UlaG_Ig
 
@@ -43,6 +50,10 @@ client.on("message", message => {
     testeplay(message);
   }
 
+  if(message.content.startsWith(`${prefix}stop`)) {
+    client.player.stop(message);
+  }
+
   if(message.content.startsWith(`${prefix}sunset`)) {
     const attachment = new MessageAttachment('https://media-cdn.tripadvisor.com/media/photo-s/01/17/7d/c6/sunset-praia-de-santos.jpg');
     message.channel.send(attachment);
@@ -63,6 +74,7 @@ client.on('ready', () => {
 });
 
 function dailyTime(){
+  // corrigir executa quando inicia
   var d = new Date();
   return (-d + d.setHours(15,0,0,0));
 }
@@ -232,9 +244,12 @@ function displayTeamBirthday(message){
 
 async function testeplay(message){
   const args = message.content.split(" ");
+  const argsX = message.content.slice('!').trim().split(/ +/g);
+  console.log('>>> argsX', argsX);
+  console.log('>>> args', args);
   const voiceChannel = message.member.voice.channel;
   if (!voiceChannel) return message.reply("você precisa estar em um canal de voz para tocar música!");
-
+  await client.player.play(message, args[1], true);
 
 }
 
