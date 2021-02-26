@@ -1,15 +1,10 @@
 const { Client, MessageAttachment, MessageEmbed  } = require('discord.js');
 const config = require("./config.json");
 const client = new Client();
-const { Player } = require("discord-player");
-// Create a new Player (you don't need any API Key)
-const player = new Player(client);
-// To easily access the player
-client.player = player;
-// add the trackStart event so when a song will be played this message will be sent
-client.player.on('trackStart', (message, track) => message.channel.send(`Now playing ${track.title}...`))
 
-// https://www.youtube.com/watch?v=VBj_UlaG_Ig
+const { Player } = require("discord-player");
+const player = new Player(client);
+client.player = player;
 
 const prefix = "!";
 
@@ -47,7 +42,19 @@ client.on("message", message => {
   }
 
   if(message.content.startsWith(`${prefix}play`)) {
-    testeplay(message);
+    playMusic(message);
+  }
+
+  if(message.content.startsWith(`${prefix}pause`)) {
+    pauseMusic(message);
+  }
+
+  if(message.content.startsWith(`${prefix}resume`)) {
+    resumeMusic(message);
+  }
+
+  if(message.content.startsWith(`${prefix}skip`)) {
+    skipMusic(message);
   }
 
   if(message.content.startsWith(`${prefix}stop`)) {
@@ -62,26 +69,26 @@ client.on("message", message => {
 
 client.on('ready', () => {    
   console.log(`Bot online: ${client.user.tag}!`);
-
-  // setTimeout(() => { // in dailyTime() milliseconds run this:
-  //   sendMessage();
-  //   var dayMillseconds = 1000 * 60 * 60 * 24;
-  //   setInterval(() => { // repeat this every 24 hours
-  //     sendMessage();
-  //   }, dayMillseconds)
-  // }, dailyTime()) 
+  setInterval(function() {
+    checkDate();
+  },60000);
 
 });
 
-function dailyTime(){
-  // corrigir executa quando inicia
-  var d = new Date();
-  return (-d + d.setHours(15,0,0,0));
-}
+client.player.on('trackStart', (message, track) => {
+  message.channel.send(`Now playing ${track.title}...`);
+})
 
-function sendMessage(){
-  const channel = client.channels.cache.find(channel => channel.name === 'teste-do-bot')
-  channel.send('@here Daily Time!!!')
+client.player.on('trackAdd', (message, queue, track) => {
+  message.channel.send(`${track.title} has been added to the queue!`);
+})
+
+function checkDate() {
+  var date = new Date();
+  if(date.getDay() === 1 && date.getHours() === 10 && date.getMinutes() === 0) {
+    const channel = client.channels.cache.find(channel => channel.name === 'teste-do-bot')
+    channel.send('@here Daily Time!!!')
+  }
 }
 
 function displayDevTeam(message){
@@ -242,14 +249,25 @@ function displayTeamBirthday(message){
   message.channel.send(embed);
 }
 
-async function testeplay(message){
-  const args = message.content.split(" ");
-  const argsX = message.content.slice('!').trim().split(/ +/g);
-  console.log('>>> argsX', argsX);
+async function playMusic(message){
+  const args = message.content.split("!play ");
   console.log('>>> args', args);
   const voiceChannel = message.member.voice.channel;
   if (!voiceChannel) return message.reply("você precisa estar em um canal de voz para tocar música!");
+  if(!args[1]) return message.reply("vou dar play no que amigão?");
   await client.player.play(message, args[1], true);
 
+}
+
+function pauseMusic(message) {
+  client.player.pause(message);
+}
+
+function skipMusic(message) {
+  client.player.skip(message);
+}
+
+function resumeMusic(message) {
+  client.player.resume(message);
 }
 
