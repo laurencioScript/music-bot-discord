@@ -13,7 +13,7 @@ const commands = [
           {
               name: "query",
               type: 3,
-              description: "The song you want to play",
+              description: "The song you want to play. Example: /play in the end",
               required: true,            
           }
       ]
