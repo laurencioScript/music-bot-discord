@@ -1,18 +1,28 @@
 const { REST } = require("@discordjs/rest");
 const { Routes } = require("discord-api-types/v9");
 
-const commands = [{
-    name: "play",
-    description: "Plays a song!",    
-    options: [
-        {
-            name: "query",
-            type: 3,
-            description: "The song you want to play",
-            required: true,            
-        }
-    ]
-}]; 
+const commands = [
+  {
+    name: "ping",
+    description: 'Replies with Pong!'
+  },
+  {
+      name: "play",
+      description: "Plays a song!",    
+      options: [
+          {
+              name: "query",
+              type: 3,
+              description: "The song you want to play",
+              required: true,            
+          }
+      ]
+  },
+  {
+    name: "stop",
+    description: "Stop a song!"  
+  }
+]; 
 
 const rest = new REST({ version: "9" }).setToken(process.env.DISCORD_TOKEN);
 

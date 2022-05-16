@@ -1,9 +1,14 @@
 module.exports = function({ player }){
     return {
         handle: async (interaction) => {
+            
             if (!interaction.isCommand()) return;
-        
-            console.log('>>> interaction.commandName', interaction.commandName);
+
+            if (interaction.commandName === 'ping') {
+                await interaction.reply('Pong!');
+            }
+
+            let guildQueue = player.getQueue(interaction.guild.id);
             
             if (interaction.commandName === "play") {
                 if (!interaction.member.voice.channelId) return await interaction.reply({ content: "You are not in a voice channel!", ephemeral: true });
@@ -31,6 +36,10 @@ module.exports = function({ player }){
                 queue.play(track);
         
                 return await interaction.followUp({ content: `⏱️ | Loading track **${track.title}**!` });
+            }
+
+            if(interaction.commandName === 'stop') {
+                guildQueue.stop();
             }
         }
     }
