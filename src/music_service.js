@@ -45,7 +45,12 @@ const commands = {
     },
     stop : async ({ player, interaction }) => {
         let guildQueue = player.getQueue(interaction.guild.id);
-        guildQueue.stop();
+        if(guildQueue){
+            const track = guildQueue.previousTracks[0]
+            guildQueue.stop();
+            return await interaction.reply({ content: `❌ | Stopping track **${track.title}**!` });
+        }
+        return await interaction.reply({ content: `❌ | Track not found!` });
     }
 }
 
